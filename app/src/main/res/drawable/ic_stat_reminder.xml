@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kleines Benachrichtigungs-Icon: die zwei Figuren, einfarbig -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <group
+        android:translateX="-30"
+        android:translateY="-31">
+        <path
+            android:fillColor="#FFFFFF"
+            android:fillAlpha="0.5"
+            android:pathData="M38,45 a8,8 0 1 0 16,0 a8,8 0 1 0 -16,0 Z M32,73 A14,14 0 0 1 60,73 Z" />
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M54,45 a8,8 0 1 0 16,0 a8,8 0 1 0 -16,0 Z M48,73 A14,14 0 0 1 76,73 Z" />
+    </group>
+</vector>

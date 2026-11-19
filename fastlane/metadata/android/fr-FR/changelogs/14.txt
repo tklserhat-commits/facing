@@ -1,0 +1,1 @@
+Première version publique : série photo quotidienne avec superposition, groupes, calendrier, comparaison, film accéléré avec musique, import, sauvegarde, widgets et rappel. Allemand, anglais, espagnol et français.

@@ -1,0 +1,29 @@
+Facing t'aide à prendre une photo par jour et transforme la série en film accéléré.
+
+<b>Appareil photo</b>
+<ul>
+<li>Superposition de ta dernière photo pour que chaque image s'aligne</li>
+<li>Grille, caméra avant/arrière, retardateur, déclenchement par les touches de volume</li>
+<li>Série en cours et rappel quotidien facultatif</li>
+</ul>
+
+<b>Séries et groupes</b>
+<ul>
+<li>Séries séparées pour toi, deux personnes ensemble, un animal, une plante ou une autre personne</li>
+<li>Galerie, calendrier, notes et favoris</li>
+<li>Compare deux jours avec un curseur de fondu</li>
+</ul>
+
+<b>Film</b>
+<ul>
+<li>Lis ta série, choisis la période et la vitesse</li>
+<li>Export en MP4 avec date et musique (en boucle si elle est plus courte)</li>
+</ul>
+
+<b>Tes données restent à toi</b>
+<ul>
+<li>Pas de compte, pas de permission internet, pas de suivi</li>
+<li>Import de photos existantes ; copie facultative des nouvelles dans la galerie</li>
+<li>Sauvegarde et restauration en ZIP, sauvegarde hebdomadaire automatique facultative</li>
+<li>Widgets pour l'écran d'accueil</li>
+</ul>

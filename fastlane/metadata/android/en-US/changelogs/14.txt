@@ -1,0 +1,1 @@
+First public release: daily photo series with ghost overlay, groups, calendar, compare, time-lapse movie export with music, import, backup, widgets, reminder. English, German, Spanish and French.

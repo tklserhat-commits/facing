@@ -1,0 +1,29 @@
+Facing helps you take one photo a day and turns the series into a time-lapse movie.
+
+<b>Camera</b>
+<ul>
+<li>Ghost overlay of your last photo so every picture lines up</li>
+<li>Grid, front/back camera, self-timer, volume-key shutter</li>
+<li>Streak counter and optional daily reminder</li>
+</ul>
+
+<b>Series and groups</b>
+<ul>
+<li>Separate series for yourself, two people together, a pet, a plant or someone else</li>
+<li>Gallery, calendar, notes and favorites</li>
+<li>Compare two days with a cross-fade slider</li>
+</ul>
+
+<b>Movie</b>
+<ul>
+<li>Play your series, pick a time range and speed</li>
+<li>Export as MP4 with date stamp and music (loops if shorter)</li>
+</ul>
+
+<b>Your data stays yours</b>
+<ul>
+<li>No account, no internet permission, no tracking</li>
+<li>Import existing photos, optional copy of new photos to your gallery</li>
+<li>Backup and restore as ZIP, optional weekly automatic backup</li>
+<li>Home-screen widgets</li>
+</ul>

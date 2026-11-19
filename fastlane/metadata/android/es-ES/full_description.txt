@@ -1,0 +1,29 @@
+Facing te ayuda a hacer una foto al día y convierte la serie en una película time-lapse.
+
+<b>Cámara</b>
+<ul>
+<li>Superposición de tu última foto para que todas encajen</li>
+<li>Cuadrícula, cámara frontal/trasera, autotemporizador, botón de volumen como disparador</li>
+<li>Racha y recordatorio diario opcional</li>
+</ul>
+
+<b>Series y grupos</b>
+<ul>
+<li>Series separadas para ti, dos personas juntas, una mascota, una planta u otra persona</li>
+<li>Galería, calendario, notas y favoritas</li>
+<li>Compara dos días con un control de fundido</li>
+</ul>
+
+<b>Película</b>
+<ul>
+<li>Reproduce tu serie, elige período y velocidad</li>
+<li>Exporta a MP4 con fecha y música (se repite si es más corta)</li>
+</ul>
+
+<b>Tus datos son tuyos</b>
+<ul>
+<li>Sin cuenta, sin permiso de internet, sin rastreo</li>
+<li>Importa fotos existentes; copia opcional de las nuevas a la galería</li>
+<li>Copia de seguridad y restauración en ZIP, copia semanal automática opcional</li>
+<li>Widgets para la pantalla de inicio</li>
+</ul>

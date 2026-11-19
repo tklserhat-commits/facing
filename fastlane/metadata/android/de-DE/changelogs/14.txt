@@ -1,0 +1,1 @@
+Erste öffentliche Version: tägliche Fotoserie mit Overlay, Gruppen, Kalender, Vergleich, Zeitraffer-Film mit Musik, Import, Backup, Widgets, Erinnerung. Deutsch, Englisch, Spanisch und Französisch.

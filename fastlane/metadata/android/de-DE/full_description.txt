@@ -1,0 +1,29 @@
+Facing hilft dir, jeden Tag ein Foto zu machen, und macht aus der Serie einen Zeitraffer-Film.
+
+<b>Kamera</b>
+<ul>
+<li>Overlay deines letzten Fotos, damit jedes Bild passt</li>
+<li>Raster, Front-/Rückkamera, Selbstauslöser, Lautstärketaste als Auslöser</li>
+<li>Serie (Streak) und optionale tägliche Erinnerung</li>
+</ul>
+
+<b>Serien und Gruppen</b>
+<ul>
+<li>Getrennte Serien für dich, zwei Personen zusammen, ein Haustier, eine Pflanze oder jemand anderen</li>
+<li>Galerie, Kalender, Notizen und Favoriten</li>
+<li>Zwei Tage mit Überblend-Regler vergleichen</li>
+</ul>
+
+<b>Film</b>
+<ul>
+<li>Serie abspielen, Zeitraum und Tempo wählen</li>
+<li>Export als MP4 mit Datum und Musik (wiederholt sich, wenn sie kürzer ist)</li>
+</ul>
+
+<b>Deine Daten gehören dir</b>
+<ul>
+<li>Kein Konto, keine Internet-Berechtigung, kein Tracking</li>
+<li>Vorhandene Fotos importieren, neue Fotos optional auch in die Galerie kopieren</li>
+<li>Backup und Wiederherstellung als ZIP, optional wöchentlich automatisch</li>
+<li>Home-Screen-Widgets</li>
+</ul>
