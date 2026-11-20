@@ -12,6 +12,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import app.facing.data.prefs.ColorPalette
 import app.facing.data.prefs.CustomColors
@@ -67,6 +68,10 @@ fun FacingTheme(
 ) {
     val context = LocalContext.current
     val dark = isDarkTheme(mode)
-    val scheme = remember(palette, dark, amoled, custom) { colorSchemeFor(context, palette, dark, amoled, custom) }
+    // Die Konfiguration als Schlüssel: ändert sich das System (z. B. Samsung-Farbpalette), werden die Farben neu gelesen
+    val configuration = LocalConfiguration.current
+    val scheme = remember(palette, dark, amoled, custom, configuration) {
+        colorSchemeFor(context, palette, dark, amoled, custom)
+    }
     MaterialTheme(colorScheme = scheme, content = content)
 }

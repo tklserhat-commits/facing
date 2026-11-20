@@ -190,7 +190,7 @@ fun CameraScreen(app: FacingApp, onGallery: () -> Unit, onMovie: () -> Unit) {
     // Buttons über der Kamera-Vorschau bleiben immer dunkel/transparent mit weißer Schrift (Live-Bild dahinter)
     val dim = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.55f), contentColor = Color.White)
     // Alles unterhalb der Vorschau folgt dem Theme
-    val ink = MaterialTheme.colorScheme.onBackground
+    val ink = MaterialTheme.colorScheme.primary   // Auslöser in der Akzentfarbe des Themes
 
     Column(
         Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding().navigationBarsPadding(),
