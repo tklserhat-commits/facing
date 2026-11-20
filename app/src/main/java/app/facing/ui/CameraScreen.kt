@@ -36,6 +36,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -87,6 +88,7 @@ fun CameraScreen(app: FacingApp, onGallery: () -> Unit, onMovie: () -> Unit) {
     var front by remember { mutableStateOf(true) }
     var busy by remember { mutableStateOf(false) }
     var showReminder by remember { mutableStateOf(false) }
+    var showTheme by remember { mutableStateOf(false) }
     var timer by rememberSaveable { mutableIntStateOf(0) } // Selbstauslöser: 0, 3 oder 10 Sekunden
     var countdown by remember { mutableIntStateOf(0) }
     var countdownJob by remember { mutableStateOf<Job?>(null) }
@@ -185,8 +187,13 @@ fun CameraScreen(app: FacingApp, onGallery: () -> Unit, onMovie: () -> Unit) {
         onDispose { ShutterKeys.onPress = null }
     }
 
+    // Buttons über der Kamera-Vorschau bleiben immer dunkel/transparent mit weißer Schrift (Live-Bild dahinter)
+    val dim = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.55f), contentColor = Color.White)
+    // Alles unterhalb der Vorschau folgt dem Theme
+    val ink = MaterialTheme.colorScheme.onBackground
+
     Column(
-        Modifier.fillMaxSize().background(Color.Black).statusBarsPadding().navigationBarsPadding(),
+        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding().navigationBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Vorschau + Overlay des letzten Fotos + Raster
@@ -206,12 +213,17 @@ fun CameraScreen(app: FacingApp, onGallery: () -> Unit, onMovie: () -> Unit) {
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    val dim = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.55f))
                     Button(onClick = onGallery, colors = dim) { Text(stringResource(R.string.nav_photos)) }
                     Button(onClick = onMovie, colors = dim) { Text(stringResource(R.string.nav_movie)) }
                     Button(onClick = { showReminder = true }, colors = dim) { Text("🔔") }
                 }
-                GroupChip(app)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    GroupChip(app)
+                    Button(onClick = { showTheme = true }, colors = dim) { Text("🎨") }
+                }
             }
             if (countdown > 0) {
                 Text(
@@ -236,7 +248,6 @@ fun CameraScreen(app: FacingApp, onGallery: () -> Unit, onMovie: () -> Unit) {
 
         Text(
             stringResource(R.string.overlay_percent, (settings.overlayOpacity * 100).toInt()),
-            color = Color.White,
             modifier = Modifier.padding(top = 8.dp),
         )
         Slider(
@@ -254,10 +265,10 @@ fun CameraScreen(app: FacingApp, onGallery: () -> Unit, onMovie: () -> Unit) {
                 TextButton(onClick = { scope.launch { app.settings.setShowGrid(!settings.showGrid) } }) {
                     Text(stringResource(if (settings.showGrid) R.string.grid_off else R.string.grid_on))
                 }
-                Text(stringResource(R.string.today_count, todayPhotos.size), color = Color.White)
+                Text(stringResource(R.string.today_count, todayPhotos.size))
                 if (streak > 0) {
                     val streakText = pluralStringResource(R.plurals.streak_days, streak, streak)
-                    Text("🔥 $streakText", color = Color.White)
+                    Text("🔥 $streakText")
                 }
             }
 
@@ -266,10 +277,10 @@ fun CameraScreen(app: FacingApp, onGallery: () -> Unit, onMovie: () -> Unit) {
                 Modifier
                     .size(76.dp)
                     .clip(CircleShape)
-                    .border(4.dp, Color.White, CircleShape)
+                    .border(4.dp, ink, CircleShape)
                     .padding(8.dp)
                     .clip(CircleShape)
-                    .background(if (busy) Color.Gray else Color.White)
+                    .background(if (busy) ink.copy(alpha = 0.4f) else ink)
                     .clickable(enabled = !busy || countdown > 0) { requestShot() }
             )
 
@@ -283,6 +294,7 @@ fun CameraScreen(app: FacingApp, onGallery: () -> Unit, onMovie: () -> Unit) {
     }
 
     if (showReminder) ReminderDialog { showReminder = false }
+    if (showTheme) ThemeDialog(app) { showTheme = false }
 }
 
 private suspend fun Context.cameraProvider(): ProcessCameraProvider = suspendCoroutine { cont ->

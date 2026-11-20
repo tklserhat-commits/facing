@@ -17,6 +17,7 @@ No account, no internet permission, no tracking: all photos stay on your device.
 - **Backup / restore** as ZIP, optional weekly automatic backup to a folder you choose
 - Home-screen widgets: photo ("1 year ago today"), streak, today status
 - Daily reminder (only if you haven't taken a photo yet)
+- **Themes**: Material You (Android 12+), light/dark following the system or fixed, Catppuccin, Nord, Gruvbox, Rosé Pine, optional pure black (AMOLED)
 - Languages: English, Deutsch, Español, Français
 
 ## Build
@@ -41,6 +42,7 @@ Kotlin, Jetpack Compose, Room, DataStore, CameraX, WorkManager, Coil. No Google 
 | `data/backup/` | `BackupManager` (ZIP + `photos.json`), `AutoBackup` (WorkManager) |
 | `data/prefs/` | Settings in DataStore |
 | `reminder/`, `widget/` | Notification scheduling, home-screen widgets |
+| `ui/theme/` | Colour palettes (`Palettes.kt`) and theme setup (`Theme.kt`) |
 | `ui/` | Compose screens: camera, gallery, calendar, compare, movie, dialogs |
 
 Strings live in `app/src/main/res/values*/strings.xml` (English is the default/fallback).

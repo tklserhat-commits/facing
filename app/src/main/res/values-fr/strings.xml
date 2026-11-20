@@ -145,4 +145,12 @@
         <item quantity="one">Aujourd\'hui : ✓ %d photo</item>
         <item quantity="other">Aujourd\'hui : ✓ %d photos</item>
     </plurals>
+    <string name="theme_title">Apparence</string>
+    <string name="theme_section_mode">Luminosité</string>
+    <string name="theme_mode_system">Suivre le système</string>
+    <string name="theme_mode_light">Clair</string>
+    <string name="theme_mode_dark">Sombre</string>
+    <string name="theme_section_palette">Couleurs</string>
+    <string name="palette_standard">Par défaut</string>
+    <string name="theme_amoled">Noir pur (AMOLED)</string>
 </resources>

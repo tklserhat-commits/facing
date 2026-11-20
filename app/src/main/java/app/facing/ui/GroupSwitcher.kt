@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -45,9 +46,18 @@ fun GroupChip(app: FacingApp, modifier: Modifier = Modifier, light: Boolean = fa
     Button(
         onClick = { open = true },
         modifier = modifier,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = if (light) Color.White.copy(alpha = 0.18f) else Color.Black.copy(alpha = 0.55f),
-        ),
+        // light = auf normalem Theme-Hintergrund (Galerie, Film); sonst über der Kamera-Vorschau
+        colors = if (light) {
+            ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+            )
+        } else {
+            ButtonDefaults.buttonColors(
+                containerColor = Color.Black.copy(alpha = 0.55f),
+                contentColor = Color.White,
+            )
+        },
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
     ) {
         Text(

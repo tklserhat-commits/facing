@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -122,13 +123,13 @@ fun MovieScreen(app: FacingApp, onClose: () -> Unit) {
     }
 
     Column(
-        Modifier.fillMaxSize().background(Color.Black).statusBarsPadding().navigationBarsPadding()
+        Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding().navigationBarsPadding()
             .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onClose) { Text(stringResource(R.string.back)) }
-            Text(stringResource(R.string.movie_title), color = Color.White, modifier = Modifier.weight(1f))
+            Text(stringResource(R.string.movie_title), modifier = Modifier.weight(1f))
             GroupChip(app, Modifier.padding(end = 8.dp), light = true)
         }
 
@@ -161,7 +162,7 @@ fun MovieScreen(app: FacingApp, onClose: () -> Unit) {
                             .padding(horizontal = 6.dp, vertical = 2.dp),
                     )
                 }
-                Text(stringResource(R.string.frame_of, i + 1, list.size), color = Color.White, modifier = Modifier.padding(top = 8.dp))
+                Text(stringResource(R.string.frame_of, i + 1, list.size), modifier = Modifier.padding(top = 8.dp))
                 if (list.size >= 2) {
                     Slider(
                         value = i.toFloat(),

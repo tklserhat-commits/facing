@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -57,14 +58,13 @@ fun CalendarView(app: FacingApp, covers: List<PhotoEntity>, onDay: (String) -> U
             TextButton(onClick = { month = ym.minusMonths(1).toString() }) { Text("‹") }
             Text(
                 ym.month.getDisplayName(TextStyle.FULL, Locale.getDefault()) + " " + ym.year,
-                color = Color.White,
             )
             TextButton(onClick = { month = ym.plusMonths(1).toString() }) { Text("›") }
         }
         Row(Modifier.fillMaxWidth()) {
             for (d in java.time.DayOfWeek.values().map { it.getDisplayName(TextStyle.SHORT, Locale.getDefault()) }) {
                 Text(
-                    d, color = Color.Gray, fontSize = 12.sp, textAlign = TextAlign.Center,
+                    d, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp, textAlign = TextAlign.Center,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -85,7 +85,6 @@ fun CalendarView(app: FacingApp, covers: List<PhotoEntity>, onDay: (String) -> U
         val count = (1..ym.lengthOfMonth()).count { byDay.containsKey(ym.atDay(it).toString()) }
         Text(
             stringResource(R.string.calendar_days_of, count, ym.lengthOfMonth()),
-            color = Color.White,
             modifier = Modifier.padding(8.dp),
         )
     }
@@ -99,7 +98,7 @@ private fun CalendarCell(app: FacingApp, dayOfMonth: Int, photo: PhotoEntity?, o
     Box(
         Modifier
             .aspectRatio(3f / 4f)
-            .background(Color(0xFF1C1C1C))
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .then(if (photo != null) Modifier.clickable(onClick = onClick) else Modifier),
     ) {
         if (photo != null) {
@@ -112,7 +111,7 @@ private fun CalendarCell(app: FacingApp, dayOfMonth: Int, photo: PhotoEntity?, o
         }
         Text(
             dayOfMonth.toString() + if (photo?.isFavorite == true) " ★" else "",
-            color = if (photo != null) Color.White else Color.Gray,
+            color = if (photo != null) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
             fontSize = 11.sp,
             modifier = Modifier
                 .align(Alignment.TopStart)

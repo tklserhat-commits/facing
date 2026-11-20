@@ -145,4 +145,12 @@
         <item quantity="one">Heute: ✓ %d Foto</item>
         <item quantity="other">Heute: ✓ %d Fotos</item>
     </plurals>
+    <string name="theme_title">Darstellung</string>
+    <string name="theme_section_mode">Helligkeit</string>
+    <string name="theme_mode_system">Wie System</string>
+    <string name="theme_mode_light">Hell</string>
+    <string name="theme_mode_dark">Dunkel</string>
+    <string name="theme_section_palette">Farben</string>
+    <string name="palette_standard">Standard</string>
+    <string name="theme_amoled">Reines Schwarz (AMOLED)</string>
 </resources>

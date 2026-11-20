@@ -22,6 +22,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -71,12 +72,11 @@ fun GalleryScreen(app: FacingApp, onCompare: () -> Unit = {}, onClose: () -> Uni
 
     BackHandler { if (openDay != null) openDay = null else onClose() }
 
-    Column(Modifier.fillMaxSize().background(Color.Black).statusBarsPadding().navigationBarsPadding()) {
+    Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding().navigationBarsPadding()) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = { if (openDay != null) openDay = null else onClose() }) { Text(stringResource(R.string.back)) }
             Text(
                 openDay?.let { formatDay(it) } ?: stringResource(R.string.gallery_title, days.size),
-                color = Color.White,
                 modifier = Modifier.weight(1f),
             )
             if (openDay == null) GroupChip(app, Modifier.padding(end = 8.dp), light = true)
@@ -169,7 +169,7 @@ private fun Viewer(app: FacingApp, photo: PhotoEntity, onClose: () -> Unit) {
     var note by remember(photo.id) { mutableStateOf(photo.note ?: "") }
     var confirmDelete by remember { mutableStateOf(false) }
 
-    Column(Modifier.fillMaxSize().background(Color.Black).padding(8.dp)) {
+    Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(8.dp)) {
         AsyncImage(
             model = app.photos.storage.photoFile(photo.fileName),
             contentDescription = null,
@@ -178,7 +178,6 @@ private fun Viewer(app: FacingApp, photo: PhotoEntity, onClose: () -> Unit) {
         )
         Text(
             "${formatDay(photo.day)}, ${formatTime(photo.takenAt)}",
-            color = Color.White,
             modifier = Modifier.padding(vertical = 4.dp),
         )
         OutlinedTextField(
@@ -215,6 +214,6 @@ private fun Viewer(app: FacingApp, photo: PhotoEntity, onClose: () -> Unit) {
 @Composable
 internal fun Hint(text: String) {
     Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
-        Text(text, color = Color.White)
+        Text(text)
     }
 }

@@ -14,6 +14,19 @@ import kotlinx.coroutines.flow.map
 
 enum class MovieMode { ALL_PHOTOS, ONE_PER_DAY }
 
+/** Hell/Dunkel: folgt dem System oder ist fest eingestellt. */
+enum class ThemeMode { SYSTEM, LIGHT, DARK }
+
+/** Verfügbare Farbpaletten. [displayName] ist der Eigenname (wird nicht übersetzt). */
+enum class ColorPalette(val displayName: String) {
+    MATERIAL_YOU("Material You"),
+    STANDARD("Standard"),
+    CATPPUCCIN("Catppuccin"),
+    NORD("Nord"),
+    GRUVBOX("Gruvbox"),
+    ROSE_PINE("Rosé Pine"),
+}
+
 data class Settings(
     val movieMode: MovieMode = MovieMode.ALL_PHOTOS,
     val fps: Int = 5,                    // 2, 5 oder 10
@@ -25,6 +38,9 @@ data class Settings(
     val currentGroupId: Long = 1,        // aktive Gruppe (Fotoreihe)
     val reminderEnabled: Boolean = false,
     val reminderMinutes: Int = 19 * 60,  // Minuten seit Mitternacht
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val palette: ColorPalette = ColorPalette.MATERIAL_YOU,
+    val amoled: Boolean = false,         // reines Schwarz im Dunkelmodus
 )
 
 private val Context.dataStore by preferencesDataStore(name = "settings")
@@ -42,6 +58,9 @@ class SettingsRepository(private val context: Context) {
         val currentGroupId = longPreferencesKey("currentGroupId")
         val reminderEnabled = booleanPreferencesKey("reminderEnabled")
         val reminderMinutes = intPreferencesKey("reminderMinutes")
+        val themeMode = stringPreferencesKey("themeMode")
+        val palette = stringPreferencesKey("palette")
+        val amoled = booleanPreferencesKey("amoled")
     }
 
     val settings: Flow<Settings> = context.dataStore.data.map { p ->
@@ -58,6 +77,11 @@ class SettingsRepository(private val context: Context) {
             currentGroupId = p[Keys.currentGroupId] ?: d.currentGroupId,
             reminderEnabled = p[Keys.reminderEnabled] ?: d.reminderEnabled,
             reminderMinutes = p[Keys.reminderMinutes] ?: d.reminderMinutes,
+            themeMode = p[Keys.themeMode]
+                ?.let { runCatching { ThemeMode.valueOf(it) }.getOrNull() } ?: d.themeMode,
+            palette = p[Keys.palette]
+                ?.let { runCatching { ColorPalette.valueOf(it) }.getOrNull() } ?: d.palette,
+            amoled = p[Keys.amoled] ?: d.amoled,
         )
     }
 
@@ -75,4 +99,7 @@ class SettingsRepository(private val context: Context) {
     suspend fun setCurrentGroup(v: Long) = edit { it[Keys.currentGroupId] = v }
     suspend fun setReminderEnabled(v: Boolean) = edit { it[Keys.reminderEnabled] = v }
     suspend fun setReminderMinutes(v: Int) = edit { it[Keys.reminderMinutes] = v }
+    suspend fun setThemeMode(v: ThemeMode) = edit { it[Keys.themeMode] = v.name }
+    suspend fun setPalette(v: ColorPalette) = edit { it[Keys.palette] = v.name }
+    suspend fun setAmoled(v: Boolean) = edit { it[Keys.amoled] = v }
 }
