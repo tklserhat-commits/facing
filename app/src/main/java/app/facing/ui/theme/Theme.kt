@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import app.facing.data.prefs.ColorPalette
+import app.facing.data.prefs.CustomColors
 import app.facing.data.prefs.ThemeMode
 
 /** Material You (dynamische Farben aus dem Hintergrundbild) gibt es erst ab Android 12 (API 31). */
@@ -29,7 +30,13 @@ fun isDarkTheme(mode: ThemeMode): Boolean = when (mode) {
 }
 
 /** Baut das passende [ColorScheme] für Palette + hell/dunkel (+ optional reines Schwarz). */
-fun colorSchemeFor(context: Context, palette: ColorPalette, dark: Boolean, amoled: Boolean): ColorScheme {
+fun colorSchemeFor(
+    context: Context,
+    palette: ColorPalette,
+    dark: Boolean,
+    amoled: Boolean,
+    custom: CustomColors,
+): ColorScheme {
     val standard = if (dark) darkColorScheme() else lightColorScheme()
     val base = when (palette) {
         ColorPalette.STANDARD -> standard
@@ -39,6 +46,7 @@ fun colorSchemeFor(context: Context, palette: ColorPalette, dark: Boolean, amole
             } else {
                 standard // ältere Geräte: Rückfall auf das Standard-Schema
             }
+        ColorPalette.CUSTOM -> customScheme(custom, dark)
         else -> fixedScheme(palette, dark) ?: standard
     }
     return if (dark && amoled) {
@@ -54,10 +62,11 @@ fun FacingTheme(
     mode: ThemeMode,
     palette: ColorPalette,
     amoled: Boolean,
+    custom: CustomColors,
     content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
     val dark = isDarkTheme(mode)
-    val scheme = remember(palette, dark, amoled) { colorSchemeFor(context, palette, dark, amoled) }
+    val scheme = remember(palette, dark, amoled, custom) { colorSchemeFor(context, palette, dark, amoled, custom) }
     MaterialTheme(colorScheme = scheme, content = content)
 }

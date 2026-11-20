@@ -153,4 +153,13 @@
     <string name="theme_section_palette">Couleurs</string>
     <string name="palette_standard">Par défaut</string>
     <string name="theme_amoled">Noir pur (AMOLED)</string>
+    <string name="palette_custom">Personnalisé</string>
+    <string name="theme_custom_dark">Couleurs perso (sombre)</string>
+    <string name="theme_custom_light">Couleurs perso (clair)</string>
+    <string name="role_background">Arrière-plan</string>
+    <string name="role_text">Texte</string>
+    <string name="role_primary">Couleur principale</string>
+    <string name="role_secondary">Accent 2</string>
+    <string name="role_tertiary">Accent 3</string>
+    <string name="theme_custom_reset">Réinitialiser</string>
 </resources>

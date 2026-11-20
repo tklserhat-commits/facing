@@ -5,7 +5,9 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import app.facing.data.prefs.ColorPalette
+import app.facing.data.prefs.CustomColors
 
 /**
  * Eine Farbpalette in "einfacher" Form: nur die Farben, die wir wirklich festlegen wollen.
@@ -31,25 +33,29 @@ internal class Palette(
 )
 
 /** Übersetzt unsere einfache [Palette] in ein vollständiges Material-3-[ColorScheme]. */
-internal fun Palette.toColorScheme(dark: Boolean): ColorScheme {
+internal fun Palette.toColorScheme(dark: Boolean, autoInk: Boolean = false): ColorScheme {
     // Schriftfarbe auf Akzentfarben: im Dunkelmodus sind Akzente hell -> dunkle Schrift, im Hellmodus umgekehrt.
-    val ink = if (dark) lowest else background
+    val defaultInk = if (dark) lowest else background
+    // Bei eigenen Farben kann ein Akzent beliebig hell/dunkel sein -> Schriftfarbe nach seiner Helligkeit wählen
+    fun ink(accent: Color) =
+        if (!autoInk) defaultInk
+        else if (accent.luminance() > 0.35f) Color(0xFF101010) else Color(0xFFF5F5F5)
     // Container = Hintergrund mit etwas Akzentfarbe eingemischt (30 %)
     fun container(accent: Color) = lerp(background, accent, 0.30f)
 
     val base = if (dark) darkColorScheme() else lightColorScheme()
     return base.copy(
         primary = primary,
-        onPrimary = ink,
+        onPrimary = ink(primary),
         primaryContainer = container(primary),
         onPrimaryContainer = text,
         inversePrimary = primary,
         secondary = secondary,
-        onSecondary = ink,
+        onSecondary = ink(secondary),
         secondaryContainer = container(secondary),
         onSecondaryContainer = text,
         tertiary = tertiary,
-        onTertiary = ink,
+        onTertiary = ink(tertiary),
         tertiaryContainer = container(tertiary),
         onTertiaryContainer = text,
         background = background,
@@ -62,7 +68,7 @@ internal fun Palette.toColorScheme(dark: Boolean): ColorScheme {
         inverseSurface = text,
         inverseOnSurface = background,
         error = error,
-        onError = ink,
+        onError = ink(error),
         errorContainer = container(error),
         onErrorContainer = text,
         outline = outline,
@@ -166,7 +172,33 @@ internal fun fixedScheme(palette: ColorPalette, dark: Boolean): ColorScheme? {
         ColorPalette.NORD -> if (dark) NordDark else NordLight
         ColorPalette.GRUVBOX -> if (dark) GruvboxDark else GruvboxLight
         ColorPalette.ROSE_PINE -> if (dark) RosePineDark else RosePineDawn
-        ColorPalette.STANDARD, ColorPalette.MATERIAL_YOU -> return null
+        ColorPalette.STANDARD, ColorPalette.MATERIAL_YOU, ColorPalette.CUSTOM -> return null
     }
     return p.toColorScheme(dark)
+}
+
+/**
+ * Eigene Palette: aus nur fünf Farben des Nutzers werden die übrigen Flächenstufen berechnet,
+ * indem Hintergrund und Text in unterschiedlichen Anteilen gemischt werden.
+ */
+internal fun customScheme(c: CustomColors, dark: Boolean): ColorScheme {
+    val bg = Color(c.background)
+    val text = Color(c.text)
+    val p = Palette(
+        lowest = if (dark) lerp(bg, Color.Black, 0.25f) else lerp(bg, Color.White, 0.5f),
+        low = if (dark) lerp(bg, Color.Black, 0.12f) else lerp(bg, text, 0.04f),
+        background = bg,
+        mid = lerp(bg, text, 0.08f),
+        high = lerp(bg, text, 0.14f),
+        highest = lerp(bg, text, 0.20f),
+        text = text,
+        textMuted = lerp(text, bg, 0.30f),
+        outline = lerp(bg, text, 0.50f),
+        outlineVariant = lerp(bg, text, 0.20f),
+        primary = Color(c.primary),
+        secondary = Color(c.secondary),
+        tertiary = Color(c.tertiary),
+        error = if (dark) Color(0xFFF2B8B5) else Color(0xFFB3261E),
+    )
+    return p.toColorScheme(dark, autoInk = true)
 }

@@ -153,4 +153,13 @@
     <string name="theme_section_palette">Farben</string>
     <string name="palette_standard">Standard</string>
     <string name="theme_amoled">Reines Schwarz (AMOLED)</string>
+    <string name="palette_custom">Eigene</string>
+    <string name="theme_custom_dark">Eigene Farben (dunkel)</string>
+    <string name="theme_custom_light">Eigene Farben (hell)</string>
+    <string name="role_background">Hintergrund</string>
+    <string name="role_text">Text</string>
+    <string name="role_primary">Hauptfarbe</string>
+    <string name="role_secondary">Akzent 2</string>
+    <string name="role_tertiary">Akzent 3</string>
+    <string name="theme_custom_reset">Zurücksetzen</string>
 </resources>
