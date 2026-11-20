@@ -42,10 +42,10 @@ import app.facing.FacingApp
 import app.facing.R
 import app.facing.data.prefs.ColorPalette
 import app.facing.data.prefs.CustomColors
+import app.facing.data.prefs.CustomTheme
 import app.facing.data.prefs.Settings
 import app.facing.data.prefs.ThemeMode
 import app.facing.ui.theme.colorSchemeFor
-import app.facing.ui.theme.dynamicColorsAvailable
 import app.facing.ui.theme.isDarkTheme
 import kotlinx.coroutines.launch
 
@@ -57,16 +57,15 @@ fun ThemeDialog(app: FacingApp, onClose: () -> Unit) {
     val settings by app.settings.settings.collectAsStateWithLifecycle(Settings())
     val dark = isDarkTheme(settings.themeMode)
 
-    // Eigene Farben gelten getrennt für hell und dunkel; bearbeitet wird der gerade aktive Modus
-    val custom = if (dark) settings.customDark else settings.customLight
-    fun saveCustom(c: CustomColors) {
-        scope.launch { if (dark) app.settings.setCustomDark(c) else app.settings.setCustomLight(c) }
-    }
+    // Eigene Themen: Farben gelten getrennt für hell und dunkel; bearbeitet wird der gerade aktive Modus
+    val activeCustom = settings.activeCustom
+    val defaultColors = if (dark) CustomColors.DEFAULT_DARK else CustomColors.DEFAULT_LIGHT
+    val selectedPalette = settings.effectivePalette
 
-    // Material You gibt es nicht auf Android < 12 -> dort gilt "Standard"
-    val selectedPalette =
-        if (settings.palette == ColorPalette.MATERIAL_YOU && !dynamicColorsAvailable) ColorPalette.STANDARD
-        else settings.palette
+    // Name-Dialog (neu anlegen oder umbenennen) und Lösch-Rückfrage
+    var nameDialog by remember { mutableStateOf<NameDialogState?>(null) }
+    var deleteDialog by remember { mutableStateOf<CustomTheme?>(null) }
+    val defaultNewName = stringResource(R.string.palette_custom) + " " + (settings.customThemes.size + 1)
 
     AlertDialog(
         onDismissRequest = onClose,
@@ -87,14 +86,13 @@ fun ThemeDialog(app: FacingApp, onClose: () -> Unit) {
 
                 SectionLabel(stringResource(R.string.theme_section_palette))
                 for (palette in ColorPalette.entries) {
-                    if (palette == ColorPalette.MATERIAL_YOU && !dynamicColorsAvailable) continue
+                    if (palette == ColorPalette.CUSTOM) continue // eigene Themen werden unten einzeln gelistet
                     val label = when (palette) {
                         ColorPalette.STANDARD -> stringResource(R.string.palette_standard)
-                        ColorPalette.CUSTOM -> stringResource(R.string.palette_custom)
                         else -> palette.displayName
                     }
-                    val preview = remember(palette, dark, custom) {
-                        colorSchemeFor(context, palette, dark, amoled = false, custom = custom)
+                    val preview = remember(palette, dark) {
+                        colorSchemeFor(context, palette, dark, amoled = false, custom = defaultColors)
                     }
                     OptionRow(
                         selected = selectedPalette == palette,
@@ -103,12 +101,48 @@ fun ThemeDialog(app: FacingApp, onClose: () -> Unit) {
                     ) { scope.launch { app.settings.setPalette(palette) } }
                 }
 
-                if (selectedPalette == ColorPalette.CUSTOM) {
+                for (theme in settings.customThemes) {
+                    val colors = theme.colors(dark)
+                    val preview = remember(colors, dark) {
+                        colorSchemeFor(context, ColorPalette.CUSTOM, dark, amoled = false, custom = colors)
+                    }
+                    OptionRow(
+                        selected = selectedPalette == ColorPalette.CUSTOM && activeCustom?.id == theme.id,
+                        label = theme.name,
+                        trailing = { Swatches(preview) },
+                    ) { scope.launch { app.settings.selectCustomTheme(theme.id) } }
+                }
+                TextButton(onClick = { nameDialog = NameDialogState(null, defaultNewName) }) {
+                    Text("+ " + stringResource(R.string.theme_custom_new))
+                }
+
+                if (selectedPalette == ColorPalette.CUSTOM && activeCustom != null) {
+                    val theme = activeCustom
+                    Row(
+                        Modifier.fillMaxWidth().padding(top = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            theme.name,
+                            style = MaterialTheme.typography.titleSmall,
+                            modifier = Modifier.weight(1f),
+                        )
+                        TextButton(onClick = { nameDialog = NameDialogState(theme.id, theme.name) }) {
+                            Text(stringResource(R.string.theme_custom_rename))
+                        }
+                        TextButton(onClick = { deleteDialog = theme }) {
+                            Text(stringResource(R.string.delete))
+                        }
+                    }
                     CustomEditor(
-                        colors = custom,
+                        // Beim Wechsel des Themas oder des Modus startet der Editor frisch (alles eingeklappt)
+                        key = theme.id + dark,
+                        colors = theme.colors(dark),
                         dark = dark,
-                        onChange = { saveCustom(it) },
-                        onReset = { saveCustom(if (dark) CustomColors.DEFAULT_DARK else CustomColors.DEFAULT_LIGHT) },
+                        onChange = { c -> scope.launch { app.settings.setCustomColors(theme.id, dark, c) } },
+                        onReset = {
+                            scope.launch { app.settings.setCustomColors(theme.id, dark, defaultColors) }
+                        },
                     )
                 }
 
@@ -127,6 +161,71 @@ fun ThemeDialog(app: FacingApp, onClose: () -> Unit) {
             }
         },
         confirmButton = { TextButton(onClick = onClose) { Text(stringResource(R.string.done)) } },
+    )
+
+    nameDialog?.let { state ->
+        NameDialog(
+            initial = state.name,
+            title = stringResource(if (state.id == null) R.string.theme_custom_new else R.string.theme_custom_rename),
+            onDismiss = { nameDialog = null },
+            onConfirm = { name ->
+                nameDialog = null
+                scope.launch {
+                    if (state.id == null) app.settings.addCustomTheme(name)
+                    else app.settings.renameCustomTheme(state.id, name)
+                }
+            },
+        )
+    }
+
+    deleteDialog?.let { theme ->
+        AlertDialog(
+            onDismissRequest = { deleteDialog = null },
+            title = { Text(stringResource(R.string.theme_custom_delete_title)) },
+            text = { Text(stringResource(R.string.theme_custom_delete_message, theme.name)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    deleteDialog = null
+                    scope.launch { app.settings.deleteCustomTheme(theme.id) }
+                }) { Text(stringResource(R.string.delete)) }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteDialog = null }) { Text(stringResource(R.string.cancel)) }
+            },
+        )
+    }
+}
+
+/** [id] = null: neues Thema anlegen; sonst wird das Thema mit dieser ID umbenannt. */
+private data class NameDialogState(val id: String?, val name: String)
+
+/** Kleiner Dialog mit einem Textfeld für den Namen eines Themas. */
+@Composable
+private fun NameDialog(
+    initial: String,
+    title: String,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit,
+) {
+    var text by remember { mutableStateOf(initial) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(title) },
+        text = {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it.take(30) },
+                label = { Text(stringResource(R.string.theme_custom_name)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(text) }, enabled = text.isNotBlank()) {
+                Text(stringResource(R.string.save))
+            }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }
 
@@ -176,12 +275,13 @@ private fun Swatches(scheme: ColorScheme) {
 /** Editor für die fünf eigenen Farben: Zeile antippen -> Regler und Hex-Feld erscheinen. */
 @Composable
 private fun CustomEditor(
+    key: Any,
     colors: CustomColors,
     dark: Boolean,
     onChange: (CustomColors) -> Unit,
     onReset: () -> Unit,
 ) {
-    var expanded by remember { mutableIntStateOf(-1) }
+    var expanded by remember(key) { mutableIntStateOf(-1) }
     val labels = listOf(
         R.string.role_background, R.string.role_text, R.string.role_primary,
         R.string.role_secondary, R.string.role_tertiary,

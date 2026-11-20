@@ -162,4 +162,9 @@
     <string name="role_secondary">Acento 2</string>
     <string name="role_tertiary">Acento 3</string>
     <string name="theme_custom_reset">Restablecer</string>
+    <string name="theme_custom_new">Nuevo tema propio</string>
+    <string name="theme_custom_rename">Renombrar</string>
+    <string name="theme_custom_name">Nombre</string>
+    <string name="theme_custom_delete_title">¿Eliminar tema?</string>
+    <string name="theme_custom_delete_message">«%s» se eliminará definitivamente.</string>
 </resources>

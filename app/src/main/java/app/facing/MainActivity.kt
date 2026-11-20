@@ -74,7 +74,7 @@ class MainActivity : ComponentActivity() {
                     onDispose { }
                 }
 
-                FacingTheme(s.themeMode, s.palette, s.amoled, if (dark) s.customDark else s.customLight) {
+                FacingTheme(s.themeMode, s.effectivePalette, s.amoled, s.customColors(dark)) {
                     val bg = MaterialTheme.colorScheme.background
                     // Fensterhintergrund angleichen (sonst blitzt beim Drehen kurz die falsche Farbe auf)
                     SideEffect { window.setBackgroundDrawable(ColorDrawable(bg.toArgb())) }

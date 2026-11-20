@@ -11,6 +11,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.json.JSONArray
+import org.json.JSONObject
+import app.facing.R
 
 enum class MovieMode { ALL_PHOTOS, ONE_PER_DAY }
 
@@ -19,7 +22,6 @@ enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
 /** Verfügbare Farbpaletten. [displayName] ist der Eigenname (wird nicht übersetzt). */
 enum class ColorPalette(val displayName: String) {
-    MATERIAL_YOU("Material You"),
     STANDARD("Standard"),
     CATPPUCCIN("Catppuccin"),
     NORD("Nord"),
@@ -74,6 +76,43 @@ data class CustomColors(
     }
 }
 
+/** Ein selbst erstelltes Farbthema mit Name; Farben getrennt für dunkel und hell. */
+data class CustomTheme(
+    val id: String,
+    val name: String,
+    val dark: CustomColors,
+    val light: CustomColors,
+) {
+    fun colors(isDark: Boolean) = if (isDark) dark else light
+}
+
+private fun themesToJson(list: List<CustomTheme>): String {
+    val arr = JSONArray()
+    for (t in list) {
+        arr.put(
+            JSONObject()
+                .put("id", t.id)
+                .put("name", t.name)
+                .put("dark", t.dark.toStorage())
+                .put("light", t.light.toStorage())
+        )
+    }
+    return arr.toString()
+}
+
+private fun themesFromJson(s: String): List<CustomTheme>? = runCatching {
+    val arr = JSONArray(s)
+    (0 until arr.length()).map { i ->
+        val o = arr.getJSONObject(i)
+        CustomTheme(
+            id = o.getString("id"),
+            name = o.getString("name"),
+            dark = CustomColors.fromStorage(o.optString("dark")) ?: CustomColors.DEFAULT_DARK,
+            light = CustomColors.fromStorage(o.optString("light")) ?: CustomColors.DEFAULT_LIGHT,
+        )
+    }
+}.getOrNull()
+
 data class Settings(
     val movieMode: MovieMode = MovieMode.ALL_PHOTOS,
     val fps: Int = 5,                    // 2, 5 oder 10
@@ -86,11 +125,22 @@ data class Settings(
     val reminderEnabled: Boolean = false,
     val reminderMinutes: Int = 19 * 60,  // Minuten seit Mitternacht
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
-    val palette: ColorPalette = ColorPalette.MATERIAL_YOU,
+    val palette: ColorPalette = ColorPalette.STANDARD,
     val amoled: Boolean = false,         // reines Schwarz im Dunkelmodus
-    val customDark: CustomColors = CustomColors.DEFAULT_DARK,
-    val customLight: CustomColors = CustomColors.DEFAULT_LIGHT,
-)
+    val customThemes: List<CustomTheme> = emptyList(),
+    val activeCustomId: String? = null,
+) {
+    /** Das aktive eigene Thema (Rückfall: das erste), oder null, wenn es keines gibt. */
+    val activeCustom: CustomTheme?
+        get() = customThemes.firstOrNull { it.id == activeCustomId } ?: customThemes.firstOrNull()
+
+    /** Wie [palette], nur dass "Eigene" ohne vorhandenes Thema auf Standard zurückfällt. */
+    val effectivePalette: ColorPalette
+        get() = if (palette == ColorPalette.CUSTOM && activeCustom == null) ColorPalette.STANDARD else palette
+
+    fun customColors(dark: Boolean): CustomColors =
+        activeCustom?.colors(dark) ?: if (dark) CustomColors.DEFAULT_DARK else CustomColors.DEFAULT_LIGHT
+}
 
 private val Context.dataStore by preferencesDataStore(name = "settings")
 
@@ -110,8 +160,31 @@ class SettingsRepository(private val context: Context) {
         val themeMode = stringPreferencesKey("themeMode")
         val palette = stringPreferencesKey("palette")
         val amoled = booleanPreferencesKey("amoled")
+        // Alt (ein einziges eigenes Thema): wird nur noch zum Übernehmen gelesen
         val customDark = stringPreferencesKey("customDark")
         val customLight = stringPreferencesKey("customLight")
+        val customThemes = stringPreferencesKey("customThemes")
+        val activeCustomId = stringPreferencesKey("activeCustomId")
+    }
+
+    /**
+     * Liest die Liste der eigenen Themen. Gibt es noch keine Liste, aber das alte einzelne eigene Thema
+     * (oder war "Eigene" gewählt), wird es als erstes Thema übernommen.
+     */
+    private fun loadThemes(p: Preferences): List<CustomTheme> {
+        p[Keys.customThemes]?.let { json -> return themesFromJson(json) ?: emptyList() }
+        val oldDark = CustomColors.fromStorage(p[Keys.customDark])
+        val oldLight = CustomColors.fromStorage(p[Keys.customLight])
+        val wasCustom = p[Keys.palette] == ColorPalette.CUSTOM.name
+        if (oldDark == null && oldLight == null && !wasCustom) return emptyList()
+        return listOf(
+            CustomTheme(
+                id = "legacy",
+                name = context.getString(R.string.palette_custom),
+                dark = oldDark ?: CustomColors.DEFAULT_DARK,
+                light = oldLight ?: CustomColors.DEFAULT_LIGHT,
+            )
+        )
     }
 
     val settings: Flow<Settings> = context.dataStore.data.map { p ->
@@ -133,8 +206,8 @@ class SettingsRepository(private val context: Context) {
             palette = p[Keys.palette]
                 ?.let { runCatching { ColorPalette.valueOf(it) }.getOrNull() } ?: d.palette,
             amoled = p[Keys.amoled] ?: d.amoled,
-            customDark = CustomColors.fromStorage(p[Keys.customDark]) ?: d.customDark,
-            customLight = CustomColors.fromStorage(p[Keys.customLight]) ?: d.customLight,
+            customThemes = loadThemes(p),
+            activeCustomId = p[Keys.activeCustomId],
         )
     }
 
@@ -155,6 +228,57 @@ class SettingsRepository(private val context: Context) {
     suspend fun setThemeMode(v: ThemeMode) = edit { it[Keys.themeMode] = v.name }
     suspend fun setPalette(v: ColorPalette) = edit { it[Keys.palette] = v.name }
     suspend fun setAmoled(v: Boolean) = edit { it[Keys.amoled] = v }
-    suspend fun setCustomDark(v: CustomColors) = edit { it[Keys.customDark] = v.toStorage() }
-    suspend fun setCustomLight(v: CustomColors) = edit { it[Keys.customLight] = v.toStorage() }
+
+    // --- Eigene Themen: mehrere anlegen, umbenennen, löschen ---
+
+    private fun saveThemes(p: androidx.datastore.preferences.core.MutablePreferences, list: List<CustomTheme>) {
+        p[Keys.customThemes] = themesToJson(list)
+    }
+
+    /** Wählt ein eigenes Thema aus (und schaltet auf die Palette "Eigene"). */
+    suspend fun selectCustomTheme(id: String) = edit {
+        // Liste einmal festschreiben, damit ein übernommenes altes Thema nicht verloren geht
+        saveThemes(it, loadThemes(it))
+        it[Keys.palette] = ColorPalette.CUSTOM.name
+        it[Keys.activeCustomId] = id
+    }
+
+    /** Legt ein neues Thema an und wählt es aus. Gibt die ID zurück. */
+    suspend fun addCustomTheme(name: String): String {
+        val id = System.currentTimeMillis().toString()
+        edit {
+            val list = loadThemes(it) +
+                CustomTheme(id, name.trim(), CustomColors.DEFAULT_DARK, CustomColors.DEFAULT_LIGHT)
+            saveThemes(it, list)
+            it[Keys.palette] = ColorPalette.CUSTOM.name
+            it[Keys.activeCustomId] = id
+        }
+        return id
+    }
+
+    suspend fun renameCustomTheme(id: String, name: String) = edit {
+        saveThemes(it, loadThemes(it).map { t -> if (t.id == id) t.copy(name = name.trim()) else t })
+    }
+
+    /** Ändert die Farben eines Themas für dunkel oder hell. */
+    suspend fun setCustomColors(id: String, dark: Boolean, colors: CustomColors) = edit {
+        saveThemes(it, loadThemes(it).map { t ->
+            if (t.id != id) t else if (dark) t.copy(dark = colors) else t.copy(light = colors)
+        })
+    }
+
+    /** Löscht ein Thema. War es aktiv, wird das nächste gewählt – oder Standard, wenn keines übrig ist. */
+    suspend fun deleteCustomTheme(id: String) = edit {
+        val list = loadThemes(it).filterNot { t -> t.id == id }
+        saveThemes(it, list)
+        if (it[Keys.activeCustomId] == id || it[Keys.activeCustomId] == null) {
+            val next = list.firstOrNull()
+            if (next != null) {
+                it[Keys.activeCustomId] = next.id
+            } else {
+                it.remove(Keys.activeCustomId)
+                if (it[Keys.palette] == ColorPalette.CUSTOM.name) it[Keys.palette] = ColorPalette.STANDARD.name
+            }
+        }
+    }
 }

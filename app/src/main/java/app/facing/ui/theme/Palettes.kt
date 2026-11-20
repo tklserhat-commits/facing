@@ -165,14 +165,14 @@ private val RosePineDark = Palette(
     error = Color(0xFFEB6F92),
 )
 
-/** Liefert das Farbschema einer festen Palette – oder null, wenn die Palette keine feste ist (Standard, Material You). */
+/** Liefert das Farbschema einer festen Palette – oder null, wenn die Palette keine feste ist (Standard, Custom). */
 internal fun fixedScheme(palette: ColorPalette, dark: Boolean): ColorScheme? {
     val p = when (palette) {
         ColorPalette.CATPPUCCIN -> if (dark) CatppuccinMocha else CatppuccinLatte
         ColorPalette.NORD -> if (dark) NordDark else NordLight
         ColorPalette.GRUVBOX -> if (dark) GruvboxDark else GruvboxLight
         ColorPalette.ROSE_PINE -> if (dark) RosePineDark else RosePineDawn
-        ColorPalette.STANDARD, ColorPalette.MATERIAL_YOU, ColorPalette.CUSTOM -> return null
+        ColorPalette.STANDARD, ColorPalette.CUSTOM -> return null
     }
     return p.toColorScheme(dark)
 }
