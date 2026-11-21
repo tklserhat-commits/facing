@@ -165,6 +165,27 @@ private val RosePineDark = Palette(
     error = Color(0xFFEB6F92),
 )
 
+// ---------------------------------------------------------------------------------------------
+// Solarized (Dark/Light) – https://ethanschoonover.com/solarized/
+// (Die Zwischenstufen der Flächen sind aus den offiziellen Farben abgeleitet.)
+// ---------------------------------------------------------------------------------------------
+private val SolarizedLight = Palette(
+    lowest = Color(0xFFFFFBF0), low = Color(0xFFF7F0DC), background = Color(0xFFFDF6E3),
+    mid = Color(0xFFEEE8D5), high = Color(0xFFE3DCC6), highest = Color(0xFFD6CFB9),
+    text = Color(0xFF586E75), textMuted = Color(0xFF657B83),
+    outline = Color(0xFF93A1A1), outlineVariant = Color(0xFFE3DCC6),
+    primary = Color(0xFF268BD2), secondary = Color(0xFF2AA198), tertiary = Color(0xFF6C71C4),
+    error = Color(0xFFDC322F),
+)
+private val SolarizedDark = Palette(
+    lowest = Color(0xFF00212B), low = Color(0xFF00252F), background = Color(0xFF002B36),
+    mid = Color(0xFF073642), high = Color(0xFF0D4351), highest = Color(0xFF1A5262),
+    text = Color(0xFF93A1A1), textMuted = Color(0xFF839496),
+    outline = Color(0xFF586E75), outlineVariant = Color(0xFF0D4351),
+    primary = Color(0xFF268BD2), secondary = Color(0xFF2AA198), tertiary = Color(0xFF6C71C4),
+    error = Color(0xFFDC322F),
+)
+
 /** Liefert das Farbschema einer festen Palette – oder null, wenn die Palette keine feste ist (Standard, Custom). */
 internal fun fixedScheme(palette: ColorPalette, dark: Boolean): ColorScheme? {
     val p = when (palette) {
@@ -172,6 +193,7 @@ internal fun fixedScheme(palette: ColorPalette, dark: Boolean): ColorScheme? {
         ColorPalette.NORD -> if (dark) NordDark else NordLight
         ColorPalette.GRUVBOX -> if (dark) GruvboxDark else GruvboxLight
         ColorPalette.ROSE_PINE -> if (dark) RosePineDark else RosePineDawn
+        ColorPalette.SOLARIZED -> if (dark) SolarizedDark else SolarizedLight
         ColorPalette.STANDARD, ColorPalette.CUSTOM -> return null
     }
     return p.toColorScheme(dark)

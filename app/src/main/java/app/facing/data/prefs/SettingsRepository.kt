@@ -27,6 +27,7 @@ enum class ColorPalette(val displayName: String) {
     NORD("Nord"),
     GRUVBOX("Gruvbox"),
     ROSE_PINE("Rosé Pine"),
+    SOLARIZED("Solarized"),
     CUSTOM("Custom"),
 }
 

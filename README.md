@@ -17,7 +17,7 @@ No account, no internet permission, no tracking: all photos stay on your device.
 - **Backup / restore** as ZIP, optional weekly automatic backup to a folder you choose
 - Home-screen widgets: photo ("1 year ago today"), streak, today status
 - Daily reminder (only if you haven't taken a photo yet)
-- **Themes**: light/dark following the system or fixed, Catppuccin, Nord, Gruvbox, Rosé Pine, multiple custom themes of your own colours (create, rename, delete), optional pure black (AMOLED)
+- **Themes**: light/dark following the system or fixed, Catppuccin, Nord, Gruvbox, Rosé Pine, Solarized, multiple custom themes of your own colours (create, rename, delete), optional pure black (AMOLED)
 - Languages: English, Deutsch, Español, Français
 
 ## Build
