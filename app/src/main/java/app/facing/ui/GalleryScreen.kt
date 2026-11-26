@@ -168,6 +168,7 @@ private fun Viewer(app: FacingApp, photo: PhotoEntity, onClose: () -> Unit) {
     val scope = rememberCoroutineScope()
     var note by remember(photo.id) { mutableStateOf(photo.note ?: "") }
     var confirmDelete by remember { mutableStateOf(false) }
+    var showMove by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).padding(8.dp)) {
         AsyncImage(
@@ -190,8 +191,19 @@ private fun Viewer(app: FacingApp, photo: PhotoEntity, onClose: () -> Unit) {
             TextButton(onClick = { scope.launch { app.photos.toggleFavorite(photo) } }) {
                 Text(stringResource(if (photo.isFavorite) R.string.favorite_on else R.string.favorite_off))
             }
+            TextButton(onClick = { showMove = true }) { Text(stringResource(R.string.move_photo)) }
+        }
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             TextButton(onClick = { confirmDelete = true }) { Text(stringResource(R.string.delete)) }
             TextButton(onClick = onClose) { Text(stringResource(R.string.close)) }
+        }
+    }
+
+    if (showMove) {
+        MoveToGroupDialog(app, photo, onDismiss = { showMove = false }) { target ->
+            showMove = false
+            // Der Scope gehört zum Viewer, nicht zum Dialog; das Verschieben läuft auch zu Ende, wenn der Dialog verschwindet
+            scope.launch { app.photos.moveToGroup(photo, target.id) }
         }
     }
 

@@ -9,7 +9,7 @@ No account, no internet permission, no tracking: all photos stay on your device.
 ## Features
 
 - Daily camera with a **ghost overlay** of your last photo, grid, front/back camera, self-timer and volume-key shutter
-- **Groups**: separate series, e.g. "Me", "Together", or another person – switch any time
+- **Groups**: separate series, e.g. "Me", "Together", or another person – move photos between them, switch any time
 - **Streak**, calendar view and gallery with notes and favorites
 - **Movie**: play the series, choose a time range, 2/5/10 fps, export as MP4 (with date stamp and looping music)
 - **Compare** two days with a cross-fade slider

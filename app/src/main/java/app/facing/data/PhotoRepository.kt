@@ -86,6 +86,13 @@ class PhotoRepository(
         if (photo.isFavorite) dao.clearFavorite(photo.day, photo.groupId)
         else dao.setFavorite(photo.id, photo.day, photo.groupId)
 
+    /** Verschiebt ein Foto in eine andere Gruppe. Der Favoriten-Stern bleibt nur, wenn der Tag dort noch keinen hat. */
+    suspend fun moveToGroup(photo: PhotoEntity, targetGroupId: Long) = withContext(NonCancellable) {
+        if (photo.groupId == targetGroupId) return@withContext
+        val keepFavorite = photo.isFavorite && dao.favoritesOfDay(photo.day, targetGroupId) == 0
+        dao.updateGroup(photo.id, targetGroupId, keepFavorite)
+    }
+
     /** Alle Fotos aller Gruppen (Backup, Galerie-Export). */
     suspend fun all() = dao.getAll()
 

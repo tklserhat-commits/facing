@@ -167,4 +167,7 @@
     <string name="theme_custom_name">Name</string>
     <string name="theme_custom_delete_title">Thema löschen?</string>
     <string name="theme_custom_delete_message">„%s“ wird endgültig gelöscht.</string>
+    <string name="move_photo">Verschieben</string>
+    <string name="move_to_title">In Gruppe verschieben</string>
+    <string name="move_no_other">Lege zuerst eine zweite Gruppe an.</string>
 </resources>

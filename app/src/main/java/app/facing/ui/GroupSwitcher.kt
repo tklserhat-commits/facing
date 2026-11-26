@@ -3,6 +3,7 @@ package app.facing.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
@@ -32,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.facing.FacingApp
 import app.facing.R
 import app.facing.data.db.GroupEntity
+import app.facing.data.db.PhotoEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -149,5 +151,36 @@ private fun NameDialog(title: String, initial: String, onDismiss: () -> Unit, on
             TextButton(enabled = text.isNotBlank(), onClick = { onConfirm(text) }) { Text(stringResource(R.string.save)) }
         },
         dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
+    )
+}
+
+/** Auswahl der Zielgruppe für ein Foto; [onPick] bekommt die gewählte Gruppe (die aktuelle ist nicht wählbar). */
+@Composable
+internal fun MoveToGroupDialog(
+    app: FacingApp,
+    photo: PhotoEntity,
+    onDismiss: () -> Unit,
+    onPick: (GroupEntity) -> Unit,
+) {
+    val groups by app.photos.groups.collectAsStateWithLifecycle(emptyList())
+    val others = groups.filter { it.id != photo.groupId }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.move_to_title)) },
+        text = {
+            if (others.isEmpty()) {
+                Text(stringResource(R.string.move_no_other))
+            } else {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    others.forEach { g ->
+                        Text(
+                            stringResource(R.string.group_chip, g.name),
+                            modifier = Modifier.fillMaxWidth().clickable { onPick(g) }.padding(vertical = 12.dp),
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
     )
 }

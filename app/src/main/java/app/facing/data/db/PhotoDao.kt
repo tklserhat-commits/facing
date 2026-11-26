@@ -67,6 +67,9 @@ abstract class PhotoDao {
     @Query("UPDATE photos SET note = :note WHERE id = :id")
     abstract suspend fun updateNote(id: Long, note: String?)
 
+    @Query("UPDATE photos SET groupId = :groupId, isFavorite = :favorite WHERE id = :id")
+    abstract suspend fun updateGroup(id: Long, groupId: Long, favorite: Boolean)
+
     @Query("UPDATE photos SET isFavorite = 0 WHERE day = :day AND groupId = :groupId")
     abstract suspend fun clearFavorite(day: String, groupId: Long)
 
